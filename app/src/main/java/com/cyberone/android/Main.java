@@ -8,8 +8,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +21,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class Main extends AppCompatActivity implements View.OnClickListener{
     Button signup_btn;                 // 회원가입 버튼
@@ -61,10 +65,20 @@ public class Main extends AppCompatActivity implements View.OnClickListener{
             CustomTask task = new CustomTask();
             String result = task.execute(id,pw).get();
             Log.w("받은값",result);
+            if(result.isEmpty()){
+                Toast.makeText(this, "회원이 아닙니다.", Toast.LENGTH_SHORT).show();
+            }else{
+                ObjectMapper objectMapper = new ObjectMapper();
+                // JSON 문자열을 key-value 형태의 객체로 변환
+                HashMap myObject = objectMapper.readValue(result, HashMap.class);
+                if(myObject.isEmpty()){
 
-            Intent intent2 = new Intent(Main.this, Login.class);
-            startActivity(intent2);
-            finish();
+                }
+                Intent intent2 = new Intent(Main.this, List.class);
+                startActivity(intent2);
+                finish();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -77,7 +91,7 @@ public class Main extends AppCompatActivity implements View.OnClickListener{
         protected String doInBackground(String... strings) {
             try {
                 String str;
-                URL url = new URL("http://10.0.2.2:8080/hello");  // 어떤 서버에 요청할지(localhost 안됨.)
+                URL url = new URL("http://10.0.2.2:8080/api/hello");  // 어떤 서버에 요청할지(localhost 안됨.)
                 // ex) http://123.456.789.10:8080/hello/android
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
