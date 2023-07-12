@@ -52,14 +52,16 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
 
     public void onClick(View v) {
         if (v.getId() == R.id.buttonSignUp) {     // 회원가입 버튼을 눌렀을 때
-            if(id_edit.getText().length() >= 3){
+            if(id_edit.getText().length() <= 3){
                 Toast.makeText(this, "id는 최소 4글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
-            }else if(pw_edit.getText().length() >= 7){
+            }else if(pw_edit.getText().length() <= 7){
                 Toast.makeText(this, "pw는 최소 8글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
             }else if(!isEmail(email_edit.getText().toString())){
                 Toast.makeText(this, "이메일 형식으로 적어주세요", Toast.LENGTH_SHORT).show();
+            }else{
+                signup();
             }
-            signup();
+
 //            Intent intent = new Intent(Main.this, Signup.class);
 //            startActivity(intent);  // 새 액티비티를 열어준다.
 //            finish();               // 현재의 액티비티는 끝내준다.
@@ -78,18 +80,20 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
 
             Signup.CustomTask task = new Signup.CustomTask();
             String result = task.execute(id,userName,pw,email).get();
-            if(result == "0"){
+            if(result == "" && result == null){
                 Toast.makeText(this, "회원가입 실패.", Toast.LENGTH_SHORT).show();
             }else{
                 ObjectMapper objectMapper = new ObjectMapper();
                 // JSON 문자열을 key-value 형태의 객체로 변환
                 HashMap myObject = objectMapper.readValue(result, HashMap.class);
-                if(myObject.isEmpty()){
-
+                if(myObject.get("fail").toString().length()>0){
+                    Toast.makeText(this, myObject.get("fail").toString(), Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent2 = new Intent(Signup.this, Login.class);
+                    startActivity(intent2);
+                    finish();
                 }
-                Intent intent2 = new Intent(Signup.this, Login.class);
-                startActivity(intent2);
-                finish();
+
             }
             Log.w("받은값",result);
 
@@ -106,7 +110,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
         protected String doInBackground(String... strings) {
             try {
                 String str;
-                URL url = new URL("http://10.0.2.2:8080/api/login");  // 어떤 서버에 요청할지(localhost 안됨.)
+                URL url = new URL("http://10.0.2.2:8080/api/signup");  // 어떤 서버에 요청할지(localhost 안됨.)
                 // ex) http://123.456.789.10:8080/hello/android
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
