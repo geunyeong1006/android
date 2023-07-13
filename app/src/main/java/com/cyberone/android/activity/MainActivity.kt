@@ -1,7 +1,8 @@
-package com.cyberone.android
+package com.cyberone.android.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.cyberone.android.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

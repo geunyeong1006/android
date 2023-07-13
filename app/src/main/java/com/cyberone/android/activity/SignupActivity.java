@@ -1,4 +1,4 @@
-package com.cyberone.android;
+package com.cyberone.android.activity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cyberone.android.R;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
@@ -24,13 +25,14 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Signup extends AppCompatActivity implements View.OnClickListener {
+public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button signup_btn;                 // 회원가입 버튼
 
     EditText id_edit;                   // id 에디트
     EditText userName_edit;            // userName 에디트
     EditText pw_edit;                  // pw 에디트
+    EditText pw_conf_edit;             // pw 확인 에디트
     EditText email_edit;               // email 에디트
 
 
@@ -46,8 +48,17 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
         id_edit = (EditText)findViewById(R.id.editTextId);    // id 에디트를 찾음.
         userName_edit = (EditText)findViewById(R.id.editTextUserName);
         pw_edit = (EditText)findViewById(R.id.editTextPassword);
+        pw_conf_edit =(EditText)findViewById(R.id.editTextConfirmPassword);
         email_edit = (EditText)findViewById(R.id.editTextEmail);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        // 이전 액티비티로 이동하려면 다음과 같이 startActivity() 메서드를 사용합니다.
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     public void onClick(View v) {
@@ -58,13 +69,12 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
                 Toast.makeText(this, "pw는 최소 8글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
             }else if(!isEmail(email_edit.getText().toString())){
                 Toast.makeText(this, "이메일 형식으로 적어주세요", Toast.LENGTH_SHORT).show();
-            }else{
+            } else if (!pw_edit.getText().toString().equals(pw_conf_edit.getText().toString())) {
+                Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            } else{
                 signup();
             }
 
-//            Intent intent = new Intent(Main.this, Signup.class);
-//            startActivity(intent);  // 새 액티비티를 열어준다.
-//            finish();               // 현재의 액티비티는 끝내준다.
         }
     }
 
@@ -72,26 +82,26 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
         Log.w("signup","회원가입 하는중");
         try {
             String id = id_edit.getText().toString();
-            String userName = userName_edit.getText().toString();
+            String username = userName_edit.getText().toString();
             String pw = pw_edit.getText().toString();
             String email = email_edit.getText().toString();
 
-            Log.w("앱에서 보낸값",id+", "+userName +", "+pw +", " + email);
+            Log.w("앱에서 보낸값",id+", "+username +", "+pw +", " + email);
 
-            Signup.CustomTask task = new Signup.CustomTask();
-            String result = task.execute(id,userName,pw,email).get();
-            if(result == "" && result == null){
+            SignupActivity.CustomTask task = new SignupActivity.CustomTask();
+            String result = task.execute(id,username,pw,email).get();
+            if(result == "" || result == null){
                 Toast.makeText(this, "회원가입 실패.", Toast.LENGTH_SHORT).show();
             }else{
                 ObjectMapper objectMapper = new ObjectMapper();
                 // JSON 문자열을 key-value 형태의 객체로 변환
                 HashMap myObject = objectMapper.readValue(result, HashMap.class);
-                if(myObject.get("fail").toString().length()>0){
+                if(myObject.get("fail") != null){
                     Toast.makeText(this, myObject.get("fail").toString(), Toast.LENGTH_SHORT).show();
                 }else{
-                    Intent intent2 = new Intent(Signup.this, Login.class);
+                    Toast.makeText(this, "회원가입 성공.", Toast.LENGTH_SHORT).show();
+                    Intent intent2 = new Intent(SignupActivity.this, LoginActivity.class);
                     startActivity(intent2);
-                    finish();
                 }
 
             }
@@ -119,7 +129,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener {
 
                 // 서버에 보낼 값 포함해 요청함.
                 OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-                sendMsg = "id="+strings[0]+"&pw="+strings[1]; // GET방식으로 작성해 POST로 보냄 ex) "id=admin&pwd=1234";
+                sendMsg = "id="+strings[0]+"&username="+strings[1]+"&pw="+strings[2]+"&email="+strings[3]; // GET방식으로 작성해 POST로 보냄 ex) "id=admin&pwd=1234";
                 osw.write(sendMsg);                           // OutputStreamWriter에 담아 전송
                 osw.flush();
 

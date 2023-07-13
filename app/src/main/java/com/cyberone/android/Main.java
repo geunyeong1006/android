@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cyberone.android.activity.NewsListActivity;
+import com.cyberone.android.activity.SignupActivity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
@@ -47,7 +49,7 @@ public class Main extends AppCompatActivity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.signup_btn) {     // 회원가입 버튼을 눌렀을 때
-            Intent intent = new Intent(Main.this, Signup.class);
+            Intent intent = new Intent(Main.this, SignupActivity.class);
             startActivity(intent);  // 새 액티비티를 열어준다.
             finish();               // 현재의 액티비티는 끝내준다.
         } else if (v.getId() == R.id.login_btn) {    // 로그인 버튼을 눌렀을 때
@@ -74,7 +76,7 @@ public class Main extends AppCompatActivity implements View.OnClickListener{
                 if(myObject.isEmpty()){
 
                 }
-                Intent intent2 = new Intent(Main.this, List.class);
+                Intent intent2 = new Intent(Main.this, NewsListActivity.class);
                 startActivity(intent2);
                 finish();
             }

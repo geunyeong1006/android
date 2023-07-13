@@ -1,4 +1,4 @@
-package com.cyberone.android;
+package com.cyberone.android.activity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cyberone.android.R;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
@@ -22,13 +23,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
-public class Login extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button signup_btn;                 // 회원가입 버튼
     Button login_btn;                // 로그인 버튼
 
     EditText id_edit;                // id 에디트
     EditText pw_edit;                // pw 에디트
+
+    private final long finishmeed =1000;
+    private long presstime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +49,34 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         pw_edit = (EditText)findViewById(R.id.editTextPassword);    // pw 에디트를 찾음.
     }
 
+    @Override
+    public void onBackPressed() {
+        long tempTime = System.currentTimeMillis();
+        long intervalTime = tempTime - presstime;
+
+        if(0 <= intervalTime && finishmeed >= intervalTime){
+            finish();
+        }else{
+
+            presstime = tempTime;
+            Toast.makeText(getApplicationContext(), "한번더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void onClick(View v) {
         if (v.getId() == R.id.buttonSignUp) {     // 회원가입 버튼을 눌렀을 때
-            Intent intent = new Intent(Login.this, Signup.class);
+            Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
             startActivity(intent);  // 새 액티비티를 열어준다.
             finish();               // 현재의 액티비티는 끝내준다.
         } else if (v.getId() == R.id.buttonLogin) {    // 로그인 버튼을 눌렀을 때
-            login();
+            if(id_edit.getText().length() < 1){
+                Toast.makeText(this, "아이디를 입력하세요", Toast.LENGTH_SHORT).show();
+            }else if(pw_edit.getText().length() < 1){
+                Toast.makeText(this, "비밀번호를 입력하세요", Toast.LENGTH_SHORT).show();
+            }else{
+                login();
+            }
+
         }
     }
 
@@ -62,21 +87,23 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             String pw = pw_edit.getText().toString();
             Log.w("앱에서 보낸값",id+", "+pw);
 
-            Login.CustomTask task = new Login.CustomTask();
+            LoginActivity.CustomTask task = new LoginActivity.CustomTask();
             String result = task.execute(id,pw).get();
             Log.w("받은값",result);
-            if(result.isEmpty()){
+            if(result == "" || result == null){
                 Toast.makeText(this, "회원이 아닙니다.", Toast.LENGTH_SHORT).show();
             }else{
                 ObjectMapper objectMapper = new ObjectMapper();
                 // JSON 문자열을 key-value 형태의 객체로 변환
                 HashMap myObject = objectMapper.readValue(result, HashMap.class);
-                if(myObject.isEmpty()){
-
+                if(myObject.get("fail") != null){
+                    Toast.makeText(this, myObject.get("fail").toString(), Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent2 = new Intent(LoginActivity.this, NewsListActivity.class);
+                    startActivity(intent2);
+                    finish();
                 }
-                Intent intent2 = new Intent(Login.this, List.class);
-                startActivity(intent2);
-                finish();
+
             }
 
         } catch (Exception e) {

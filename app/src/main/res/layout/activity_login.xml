@@ -9,7 +9,7 @@
         android:id="@+id/editTextId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="ID"
+        android:hint="아이디"
         android:padding="16dp"
         android:inputType="text" />
 
@@ -17,7 +17,7 @@
         android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="PW"
+        android:hint="비밀번호"
         android:padding="16dp"
         android:inputType="textPassword" />
 

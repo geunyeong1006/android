@@ -15,7 +15,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Login"
+            android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +25,15 @@
         </activity>
 
         <activity
-            android:name=".List"
-            android:label="Login"
+            android:name=".activity.NewsListActivity"
+            android:label="NewsList"
             />
         <activity
-            android:name=".Signup"
+            android:name=".activity.NewsDetailListActivity"
+            android:label="NewsDetailList"
+            />
+        <activity
+            android:name=".activity.SignupActivity"
             android:label="Signup"
             />
         <activity

@@ -10,7 +10,7 @@
         android:id="@+id/editTextId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="ID"
+        android:hint="아이디를 입력하세요"
         android:padding="16dp"
         android:inputType="text" />
 
@@ -18,7 +18,7 @@
         android:id="@+id/editTextUserName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="USERNAME"
+        android:hint="이름을 입력하세요(미입력시 ID로 설정)"
         android:padding="16dp"
         android:inputType="textPersonName" />
 
@@ -26,7 +26,15 @@
         android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="PW"
+        android:hint="비밀번호를 입력하세요"
+        android:padding="16dp"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/editTextConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="비밀번호를 다시 입력하세요."
         android:padding="16dp"
         android:inputType="textPassword" />
 
@@ -34,7 +42,7 @@
         android:id="@+id/editTextEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="EMAIL"
+        android:hint="이메일을 입력하세요"
         android:padding="16dp"
         android:inputType="textEmailAddress" />
 
@@ -45,3 +53,4 @@
         android:text="Sign Up" />
 
 </LinearLayout>
+
