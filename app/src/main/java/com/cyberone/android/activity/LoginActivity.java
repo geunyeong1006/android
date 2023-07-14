@@ -100,6 +100,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(this, myObject.get("fail").toString(), Toast.LENGTH_SHORT).show();
                 }else{
                     Intent intent2 = new Intent(LoginActivity.this, NewsListActivity.class);
+                    intent2.putExtra("id", id); // 데이터 전달
                     startActivity(intent2);
                     finish();
                 }

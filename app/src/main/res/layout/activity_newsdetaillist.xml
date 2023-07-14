@@ -13,6 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="350dp"
         android:layout_marginTop="10dp"
+        android:clickable="true"
         android:src="@drawable/no_alarm" />
     <!-- 상단 설정 아이콘 -->
     <!-- 리스트 뷰 -->

@@ -8,9 +8,12 @@ import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,20 +40,34 @@ public class NewsDetailListActivity extends AppCompatActivity {
     ArrayList<NewsDetailItem> newsDetailItemList;
     List<Map<String, Object>> newsDetailList;  // newsList 변수를 멤버 변수로 선언
 
+    private String id;
+
+    private String param;
     String regDday = "";
 
+    private String apiName;
+
     private ListView detailListView;
+
+    private ImageView notiIconView;
+
+    private List<Map<String, Object>> alarmList;  // newsList 변수를 멤버 변수로 선언
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newsdetaillist);
 
+        Intent intent = getIntent();
+        id = intent.getStringExtra("id"); // 데이터 추출
+        regDday = intent.getStringExtra("regDday"); // 데이터 추출
+
         // 뷰 초기화
         detailListView = findViewById(R.id.newsDetailListView);
 
-        Intent intent = getIntent();
-        regDday = intent.getStringExtra("regDday"); // 데이터 추출
+        notiIconView = findViewById(R.id.notificationIcon);
+;
+
 
         // newsAdapter 초기화 전에 newsDataList를 초기화합니다.
         this.InitializeNewsDetailData();
@@ -61,7 +78,7 @@ public class NewsDetailListActivity extends AppCompatActivity {
         // newsAdapter를 listView에 설정합니다.
         detailListView.setAdapter(newsDetailAdapter);
 
-        newsClippingDetail();
+        selectNewsDetailList();
         detailListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -107,9 +124,40 @@ public class NewsDetailListActivity extends AppCompatActivity {
 
                 // 팝업을 화면에 표시
                 dialog.show();
-//                Toast.makeText(getApplicationContext(),
-//                        newsDetailItemList.get(i).getRegDtime() + " " + newsDetailItemList.get(i).getBbsTit(),
-//                        Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        selectNewsAlarmList();
+
+        notiIconView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popupMenu = new PopupMenu(NewsDetailListActivity.this, notiIconView);
+                // 메뉴 항목을 동적으로 추가합니다.
+                for (int i = 0; i < alarmList.size(); i++) {
+                    Map<String, Object> alarm = alarmList.get(i);
+                    String alarmDate = alarm.get("alarmdate").toString();
+                    String menuItemTitle = "[" + alarmDate + "] 보안 뉴스가 있습니다.";
+                    popupMenu.getMenu().add(0, i, i, menuItemTitle);
+
+                }
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int itemId = menuItem.getItemId();
+                        Map<String, Object> selectedItem = alarmList.get(itemId);
+                        String alarmDate = selectedItem.get("alarmdate").toString();
+                        updateNewsAlarm(alarmDate);
+                        // 선택한 메뉴 항목에 대한 동작을 정의합니다.
+                        // 예를 들어, 선택한 항목의 alarmDate를 사용하여 특정 작업을 수행할 수 있습니다.
+                        return true;
+                    }
+                });
+
+                popupMenu.show();
             }
         });
     }
@@ -118,13 +166,38 @@ public class NewsDetailListActivity extends AppCompatActivity {
     public void onBackPressed() {
         // 이전 액티비티로 이동하려면 다음과 같이 startActivity() 메서드를 사용합니다.
         Intent intent = new Intent(this, NewsListActivity.class);
+        intent.putExtra("id", id);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
+    void selectNewsAlarmList(){
+        Log.w("selectNewsAlarmList","계정할당 Rss알림 받아오는중");
+        apiName = "selectNewsAlarmList";
+        param = "id = " + id;
+        try {
+            NewsDetailListActivity.CustomTask task = new NewsDetailListActivity.CustomTask();
+            String result = task.execute(id).get();
+            ObjectMapper objectMapper = new ObjectMapper();
+            // JSON 문자열을 key-value 형태의 객체로 변환
+            if (result == "" || result == null) {
 
-    void newsClippingDetail() {
-        Log.w("newClipping","뉴스 받아오는중");
+            } else {
+                alarmList = objectMapper.readValue(result, new TypeReference<List<Map<String, Object>>>(){});
+                if (alarmList.size()> 0) {
+                    notiIconView.setImageResource(R.drawable.is_alarm);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    void selectNewsDetailList() {
+        Log.w("selectNewsDetailList","뉴스 받아오는중");
+        apiName = "selectNewsDetailList";
+        param = "regDday =" + regDday;
         try {
             NewsDetailListActivity.CustomTask task = new NewsDetailListActivity.CustomTask();
             String result = task.execute(regDday).get();
@@ -159,6 +232,38 @@ public class NewsDetailListActivity extends AppCompatActivity {
         }
     }
 
+    void updateNewsAlarm(String alarmdate){
+        Log.w("updateNewsAlarm","뉴스 알림 확인");
+        apiName = "updateNewsAlarm";
+        param = "id = " + id +  "&alarmdate + " + alarmdate;
+        try {
+            NewsDetailListActivity.CustomTask task = new NewsDetailListActivity.CustomTask();
+            String result = task.execute(alarmdate).get();
+            ObjectMapper objectMapper = new ObjectMapper();
+            // JSON 문자열을 key-value 형태의 객체로 변환
+            if (result == "" || result == null) {
+
+            } else {
+                alarmList = objectMapper.readValue(result, new TypeReference<List<Map<String, Object>>>(){});
+                if (alarmList.size()> 0) {
+                    for (int i = 0; i < alarmList.size(); i++) {
+                        String alarmyn = alarmList.get(i).get("alarmyn").toString();
+                        if(alarmyn == "n"){
+                            notiIconView.setImageResource(R.drawable.is_alarm);
+                            continue;
+                        }else{
+                            notiIconView.setImageResource(R.drawable.no_alarm);
+                        }
+                    }
+                }else {
+                    notiIconView.setImageResource(R.drawable.no_alarm);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     class CustomTask extends AsyncTask<String, Void, String> {
         String sendMsg, receiveMsg;
 
@@ -166,8 +271,8 @@ public class NewsDetailListActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             try {
                 String str = strings[0];
-                String baseUrl = "http://10.0.2.2:8080/api/newsClippingDetail";
-                String urlString = baseUrl + "?regDdate=" + str; // 요청 URL
+                String baseUrl = "http://10.0.2.2:8080/api/" + apiName;;
+                String urlString = baseUrl + "?"+param; // 요청 URL
                 URL url = new URL(urlString);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
