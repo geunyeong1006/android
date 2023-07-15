@@ -66,8 +66,6 @@ public class NewsDetailListActivity extends AppCompatActivity {
         detailListView = findViewById(R.id.newsDetailListView);
 
         notiIconView = findViewById(R.id.notificationIcon);
-;
-
 
         // newsAdapter 초기화 전에 newsDataList를 초기화합니다.
         this.InitializeNewsDetailData();
@@ -137,9 +135,11 @@ public class NewsDetailListActivity extends AppCompatActivity {
                 // 메뉴 항목을 동적으로 추가합니다.
                 for (int i = 0; i < alarmList.size(); i++) {
                     Map<String, Object> alarm = alarmList.get(i);
-                    String alarmDate = alarm.get("alarmdate").toString();
-                    String menuItemTitle = "[" + alarmDate + "] 보안 뉴스가 있습니다.";
-                    popupMenu.getMenu().add(0, i, i, menuItemTitle);
+                    if("n".equals(alarm.get("alarmyn"))) {
+                        String alarmDate = alarm.get("alarmdate").toString();
+                        String menuItemTitle = "[" + alarmDate + "] 보안 뉴스가 있습니다.";
+                        popupMenu.getMenu().add(0, i, i, menuItemTitle);
+                    }
 
                 }
 
@@ -150,7 +150,37 @@ public class NewsDetailListActivity extends AppCompatActivity {
                         int itemId = menuItem.getItemId();
                         Map<String, Object> selectedItem = alarmList.get(itemId);
                         String alarmDate = selectedItem.get("alarmdate").toString();
-                        updateNewsAlarm(alarmDate);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(NewsDetailListActivity.this);
+                        builder.setTitle("확인상자");  // 대화상자 제목
+                        builder.setMessage("알림을 지우시겠습니까?");  // 대화상자 메시지
+
+                        // 확인 버튼 클릭 시 동작할 이벤트 리스너
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // 확인 버튼 클릭 시 수행할 동작
+                                // TODO: 확인 버튼을 클릭한 경우에 대한 동작을 구현합니다.
+                                updateNewsAlarm(alarmDate);
+                            }
+                        });
+
+                        // 취소 버튼 클릭 시 동작할 이벤트 리스너
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // 취소 버튼 클릭 시 수행할 동작
+                                // TODO: 취소 버튼을 클릭한 경우에 대한 동작을 구현합니다.
+                                // 대화상자 닫기
+                                dialog.dismiss();
+                            }
+                        });
+
+                        // AlertDialog 객체 생성
+                        AlertDialog dialog = builder.create();
+
+                        // 대화상자를 화면에 표시
+                        dialog.show();
+
                         // 선택한 메뉴 항목에 대한 동작을 정의합니다.
                         // 예를 들어, 선택한 항목의 alarmDate를 사용하여 특정 작업을 수행할 수 있습니다.
                         return true;
@@ -167,14 +197,14 @@ public class NewsDetailListActivity extends AppCompatActivity {
         // 이전 액티비티로 이동하려면 다음과 같이 startActivity() 메서드를 사용합니다.
         Intent intent = new Intent(this, NewsListActivity.class);
         intent.putExtra("id", id);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         startActivity(intent);
     }
 
     void selectNewsAlarmList(){
         Log.w("selectNewsAlarmList","계정할당 Rss알림 받아오는중");
         apiName = "selectNewsAlarmList";
-        param = "id = " + id;
+        param = "id=" + id.trim();
         try {
             NewsDetailListActivity.CustomTask task = new NewsDetailListActivity.CustomTask();
             String result = task.execute(id).get();
@@ -185,7 +215,17 @@ public class NewsDetailListActivity extends AppCompatActivity {
             } else {
                 alarmList = objectMapper.readValue(result, new TypeReference<List<Map<String, Object>>>(){});
                 if (alarmList.size()> 0) {
-                    notiIconView.setImageResource(R.drawable.is_alarm);
+                    for (int i = 0; i < alarmList.size(); i++) {
+                        String alarmyn = alarmList.get(i).get("alarmyn").toString();
+                        if("n".equals(alarmyn)){
+                            notiIconView.setImageResource(R.drawable.is_alarm);
+                            break;
+                        }else{
+                            notiIconView.setImageResource(R.drawable.no_alarm);
+                        }
+                    }
+                }else {
+                    notiIconView.setImageResource(R.drawable.no_alarm);
                 }
             }
         } catch (Exception e){
@@ -197,7 +237,7 @@ public class NewsDetailListActivity extends AppCompatActivity {
     void selectNewsDetailList() {
         Log.w("selectNewsDetailList","뉴스 받아오는중");
         apiName = "selectNewsDetailList";
-        param = "regDday =" + regDday;
+        param = "regDday=" + regDday.trim();
         try {
             NewsDetailListActivity.CustomTask task = new NewsDetailListActivity.CustomTask();
             String result = task.execute(regDday).get();
@@ -235,30 +275,12 @@ public class NewsDetailListActivity extends AppCompatActivity {
     void updateNewsAlarm(String alarmdate){
         Log.w("updateNewsAlarm","뉴스 알림 확인");
         apiName = "updateNewsAlarm";
-        param = "id = " + id +  "&alarmdate + " + alarmdate;
+        param = "id=" + id.trim() +  "&alarmdate=" + alarmdate.trim();
         try {
             NewsDetailListActivity.CustomTask task = new NewsDetailListActivity.CustomTask();
-            String result = task.execute(alarmdate).get();
-            ObjectMapper objectMapper = new ObjectMapper();
+            task.execute(alarmdate).get();
             // JSON 문자열을 key-value 형태의 객체로 변환
-            if (result == "" || result == null) {
-
-            } else {
-                alarmList = objectMapper.readValue(result, new TypeReference<List<Map<String, Object>>>(){});
-                if (alarmList.size()> 0) {
-                    for (int i = 0; i < alarmList.size(); i++) {
-                        String alarmyn = alarmList.get(i).get("alarmyn").toString();
-                        if(alarmyn == "n"){
-                            notiIconView.setImageResource(R.drawable.is_alarm);
-                            continue;
-                        }else{
-                            notiIconView.setImageResource(R.drawable.no_alarm);
-                        }
-                    }
-                }else {
-                    notiIconView.setImageResource(R.drawable.no_alarm);
-                }
-            }
+            selectNewsAlarmList();
         } catch (Exception e){
             e.printStackTrace();
         }
