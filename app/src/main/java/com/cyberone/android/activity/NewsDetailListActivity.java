@@ -81,8 +81,8 @@ public class NewsDetailListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(NewsDetailListActivity.this);
-                builder.setTitle(newsDetailList.get(i).get("bbsTit").toString());  // 팝업 제목
-                builder.setMessage(newsDetailList.get(i).get("bbsCont").toString());  // 팝업 메시지 내용
+                builder.setTitle(String.valueOf(newsDetailList.get(i).get("bbsTit")));  // 팝업 제목
+                builder.setMessage(String.valueOf(newsDetailList.get(i).get("bbsCont")));  // 팝업 메시지 내용
 
                 // 확인 버튼 클릭 시 동작할 이벤트 리스너
                 builder.setPositiveButton("뉴스로 이동", new DialogInterface.OnClickListener() {
@@ -90,7 +90,7 @@ public class NewsDetailListActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // 확인 버튼 클릭 시 수행할 동작
                         if(newsDetailList.get(i).get("rssLink") != null && newsDetailList.get(i).get("rssLink") != ""){
-                            String link = newsDetailList.get(i).get("rssLink").toString(); // 링크 데이터 추출
+                            String link = String.valueOf(newsDetailList.get(i).get("rssLink")); // 링크 데이터 추출
 
                             // URI 생성
                             Uri uri = Uri.parse(link);
@@ -136,7 +136,7 @@ public class NewsDetailListActivity extends AppCompatActivity {
                 for (int i = 0; i < alarmList.size(); i++) {
                     Map<String, Object> alarm = alarmList.get(i);
                     if("n".equals(alarm.get("alarmyn"))) {
-                        String alarmDate = alarm.get("alarmdate").toString();
+                        String alarmDate = String.valueOf(alarm.get("alarmdate"));
                         String menuItemTitle = "[" + alarmDate + "] 보안 뉴스가 있습니다.";
                         popupMenu.getMenu().add(0, i, i, menuItemTitle);
                     }
@@ -149,7 +149,7 @@ public class NewsDetailListActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int itemId = menuItem.getItemId();
                         Map<String, Object> selectedItem = alarmList.get(itemId);
-                        String alarmDate = selectedItem.get("alarmdate").toString();
+                        String alarmDate = String.valueOf(selectedItem.get("alarmdate"));
                         AlertDialog.Builder builder = new AlertDialog.Builder(NewsDetailListActivity.this);
                         builder.setTitle("확인상자");  // 대화상자 제목
                         builder.setMessage("알림을 지우시겠습니까?");  // 대화상자 메시지
@@ -216,7 +216,7 @@ public class NewsDetailListActivity extends AppCompatActivity {
                 alarmList = objectMapper.readValue(result, new TypeReference<List<Map<String, Object>>>(){});
                 if (alarmList.size()> 0) {
                     for (int i = 0; i < alarmList.size(); i++) {
-                        String alarmyn = alarmList.get(i).get("alarmyn").toString();
+                        String alarmyn = String.valueOf(alarmList.get(i).get("alarmyn"));
                         if("n".equals(alarmyn)){
                             notiIconView.setImageResource(R.drawable.is_alarm);
                             break;

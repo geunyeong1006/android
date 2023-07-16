@@ -64,12 +64,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         if (v.getId() == R.id.buttonSignUp) {     // 회원가입 버튼을 눌렀을 때
             if(id_edit.getText().length() <= 3){
-                Toast.makeText(this, "id는 최소 4글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "아아디는 최소 4글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
             }else if(pw_edit.getText().length() <= 7){
-                Toast.makeText(this, "pw는 최소 8글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
-            }else if(!isEmail(email_edit.getText().toString())){
-                Toast.makeText(this, "이메일 형식으로 적어주세요", Toast.LENGTH_SHORT).show();
-            } else if (!pw_edit.getText().toString().equals(pw_conf_edit.getText().toString())) {
+                Toast.makeText(this, "비밀번호는 최소 8글자 이상이어야 합니다.", Toast.LENGTH_SHORT).show();
+            }else if(!isEmail(String.valueOf(email_edit.getText()))){
+                Toast.makeText(this, "이메일은 알맞은 형식으로 적어주세요", Toast.LENGTH_SHORT).show();
+            } else if (!String.valueOf(pw_edit.getText()).equals(String.valueOf(pw_conf_edit.getText()))) {
                 Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
             } else{
                 signup();
@@ -81,10 +81,10 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     void signup() {
         Log.w("signup","회원가입 하는중");
         try {
-            String id = id_edit.getText().toString();
-            String username = userName_edit.getText().toString();
-            String pw = pw_edit.getText().toString();
-            String email = email_edit.getText().toString();
+            String id = String.valueOf(id_edit.getText());
+            String username = String.valueOf(userName_edit.getText());
+            String pw = String.valueOf(pw_edit.getText());
+            String email = String.valueOf(email_edit.getText());
 
             Log.w("앱에서 보낸값",id+", "+username +", "+pw +", " + email);
 
@@ -97,7 +97,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 // JSON 문자열을 key-value 형태의 객체로 변환
                 HashMap myObject = objectMapper.readValue(result, HashMap.class);
                 if(myObject.get("fail") != null){
-                    Toast.makeText(this, myObject.get("fail").toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, String.valueOf(myObject.get("fail")), Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(this, "회원가입 성공.", Toast.LENGTH_SHORT).show();
                     Intent intent2 = new Intent(SignupActivity.this, LoginActivity.class);

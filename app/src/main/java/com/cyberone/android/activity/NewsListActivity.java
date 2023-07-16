@@ -83,7 +83,7 @@ public class NewsListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent2 = new Intent(NewsListActivity.this, NewsDetailListActivity.class);
-                intent2.putExtra("regDday", newsList.get(i).get("regDday").toString()); // 데이터 전달
+                intent2.putExtra("regDday", String.valueOf(newsList.get(i).get("regDday"))); // 데이터 전달
                 intent2.putExtra("id", id);
                 startActivity(intent2);
 
@@ -100,7 +100,7 @@ public class NewsListActivity extends AppCompatActivity {
                 for (int i = 0; i < alarmList.size(); i++) {
                     Map<String, Object> alarm = alarmList.get(i);
                     if("n".equals(alarm.get("alarmyn"))) {
-                        String alarmDate = alarm.get("alarmdate").toString();
+                        String alarmDate = String.valueOf(alarm.get("alarmdate"));
                         String menuItemTitle = "[" + alarmDate + "] 보안 뉴스가 있습니다.";
                         popupMenu.getMenu().add(0, i, i, menuItemTitle);
                     }
@@ -112,7 +112,7 @@ public class NewsListActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int itemId = menuItem.getItemId();
                         Map<String, Object> selectedItem = alarmList.get(itemId);
-                        String alarmDate = selectedItem.get("alarmdate").toString();
+                        String alarmDate = String.valueOf(selectedItem.get("alarmdate"));
                         AlertDialog.Builder builder = new AlertDialog.Builder(NewsListActivity.this);
                         builder.setTitle("확인상자");  // 대화상자 제목
                         builder.setMessage("알림을 지우시겠습니까?");  // 대화상자 메시지
@@ -138,10 +138,10 @@ public class NewsListActivity extends AppCompatActivity {
                             }
                         });
 
-// AlertDialog 객체 생성
+                        // AlertDialog 객체 생성
                         AlertDialog dialog = builder.create();
 
-// 대화상자를 화면에 표시
+                        // 대화상자를 화면에 표시
                         dialog.show();
 
                         // 선택한 메뉴 항목에 대한 동작을 정의합니다.
@@ -210,7 +210,7 @@ public class NewsListActivity extends AppCompatActivity {
                 alarmList = objectMapper.readValue(result, new TypeReference<List<Map<String, Object>>>(){});
                 if (alarmList.size()> 0) {
                     for (int i = 0; i < alarmList.size(); i++) {
-                        String alarmyn = alarmList.get(i).get("alarmyn").toString();
+                        String alarmyn = String.valueOf(alarmList.get(i).get("alarmyn"));
                         if("n".equals(alarmyn)){
                             notiIconView.setImageResource(R.drawable.is_alarm);
                             break;

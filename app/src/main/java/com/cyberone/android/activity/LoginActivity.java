@@ -83,8 +83,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     void login() {
         Log.w("login","로그인 하는중");
         try {
-            String id = id_edit.getText().toString();
-            String pw = pw_edit.getText().toString();
+            String id = String.valueOf(id_edit.getText());
+            String pw = String.valueOf(pw_edit.getText());
             Log.w("앱에서 보낸값",id+", "+pw);
 
             LoginActivity.CustomTask task = new LoginActivity.CustomTask();
@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // JSON 문자열을 key-value 형태의 객체로 변환
                 HashMap myObject = objectMapper.readValue(result, HashMap.class);
                 if(myObject.get("fail") != null){
-                    Toast.makeText(this, myObject.get("fail").toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, String.valueOf(myObject.get("fail")), Toast.LENGTH_SHORT).show();
                 }else{
                     Intent intent2 = new Intent(LoginActivity.this, NewsListActivity.class);
                     intent2.putExtra("id", id); // 데이터 전달
